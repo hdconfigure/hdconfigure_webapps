@@ -4,4 +4,4 @@
 hdconfigure_tools_install hdconfigure hdconfigure_webapps
 hdconfigure_path="~/.config/hdconfigure"
 mkdir -p "$hdconfigure_path/webapps/assets" || { error "error: install.sh for hdconfigure_webapps failed to create assets folder" ; exit 1 ; } ;
-cp "$hdonfigure_path/tools/hdconfigure/tools/hdconfigure/webapps/assets/sample_image.jpg" "$hdconfigure_path/webapps/assets/sample_image.jpg" || { error "error: install.sh for hdconfigure_webapps failed to copy sample image" ; exit 1 ; } ;
+cp "$hdonfigure_path/tools/hdconfigure/tools/hdconfigure/hdconfigure_webapps/assets/sample_image.jpg" "$hdconfigure_path/webapps/assets/sample_image.jpg" || { error "error: install.sh for hdconfigure_webapps failed to copy sample image" ; exit 1 ; } ;
