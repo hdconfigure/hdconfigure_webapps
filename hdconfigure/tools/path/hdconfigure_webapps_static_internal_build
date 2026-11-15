@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
-#~/.config/hdconfigure/tools/git/hdconfigure/hdconfigure_webapps/hdconfigure/tools/path/hdconfigure_webapps_static_build
+#~/.config/hdconfigure/tools/git/hdconfigure/hdconfigure_webapps/hdconfigure/tools/path/hdconfigure_webapps_static_internal_build
 #Copyright (C) 2026 by Theron Kauk and John Morris Beck <hd.configure.direct@gmail.com> THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-tool_name="hdconfigure_webapps_static_build"
+tool_name="hdconfigure_webapps_static_internal_build"
 
 github_username="$1"
 github_repo_name="$2"
@@ -26,7 +26,8 @@ if [ ! -f "$menu_dir/index.ts" ]; then
         error "error: $tool_name failed to find menu index file at $menu_dir/index.ts."
         exit 1
 fi
-if ! hdconfigure_webapps_static_build_page "$menu_dir"; then
+if ! hdconfigure_webapps_static_internal_build_page "$menu_dir"; then
+        error "error: $tool_name failed to build directory. hdconfigure_webapps_static_internal_build_page not installed."
         exit 1
 fi
 
@@ -46,7 +47,7 @@ while IFS= read -r file || [ -n "$file" ]; do
         [ "${dir##*/}" = "menu" ] && continue
         
         # Run the static page builder tool on the current project subdirectory
-        if ! hdconfigure_webapps_static_build_page "$dir"; then
+        if ! hdconfigure_webapps_static_internal_build_page "$dir"; then
                 # Clean up temporary file and abort if the build fails
                 rm -f "$index_list_tmp"
                 exit 1
