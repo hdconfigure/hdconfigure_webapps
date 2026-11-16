@@ -51,13 +51,13 @@ handle_home_applet() {
     create_file "$applet_page" "index.ts" "$index"
     if [ "$applet_page" != "home" ]; then
        touch "$webapp_directory/$applet_page/home_applet"
-       echo "you reached me"
     fi;
 }
 
 handle_regular_applet() {
-    if [ -f "$webapp_directory/$applet_name/home_applet" ]; then { "error: $tool_name failed to create "$webapp_directory/$1/$2" applet already exists and is a home applet"; fi;
-    echo "hello"
+    if [ -f "$webapp_directory/$applet_name/home_applet" ]; then
+	"error: $tool_name failed to create "$webapp_directory/$1/$2" applet already exists and is a home applet";
+	exit 1;
     fi
     if [ "$applet_page" = "home" ]; then
 	create_applet "$applet_name"
