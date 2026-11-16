@@ -36,7 +36,7 @@ Copyright (C) 2026 by Theron Kauk and John Morris Beck <hdconfigure.direct@gmail
 </body>
 </html>' > "$webapp_directory/index.html" || { error "error: $tool_name failed to create root index.html file for webapp."; exit 1; }
 
-cp "$HOME/.config/hdconfigure/tools/hdconfigure/hdconfigure_webapps/static/style.css" "$webapp_directory" || { error "error: $tool_name failed to copy style.css"; exit 1 ; } ;
+cp "$HOME/.config/hdconfigure/tools/git/hdconfigure/hdconfigure_webapps/static/style.css" "$webapp_directory" || { error "error: $tool_name failed to copy style.css"; exit 1 ; } ;
 
 print 'node_modules/
 dist/
