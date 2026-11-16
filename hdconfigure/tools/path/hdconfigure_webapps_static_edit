@@ -60,7 +60,7 @@ get_target_path() {
 }
 
 open_file() {
-    if [ -f "$1" ]; then vi "$1"; else
+    if [ -f "$1" ]; then emacs "$1"; else
         error "error: $tool_name index.ts does not exist at $1
 "; exit 1
     fi
