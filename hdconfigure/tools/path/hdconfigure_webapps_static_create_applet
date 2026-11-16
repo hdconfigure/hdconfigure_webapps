@@ -17,7 +17,8 @@ webapp_parent_directory="$HOME/.config/hdconfigure/webapps/static/$github_userna
 webapp_directory="$webapp_parent_directory/$github_repo_name"
 
 if [ ! -d "$webapp_directory" ]; then
-    error "error: $tool_name webapp directory $webapp_directory does not exist.\n"
+    error "error: $tool_name webapp directory $webapp_directory does not exist.
+"
     exit 1
 fi
 
