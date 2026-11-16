@@ -45,7 +45,7 @@ get_target_path() {
 
 open_file() {
     if [ -f "$1" ]; then
-        nano "$1"
+        emacs "$1"
     else
         error "error: $tool_name index.ts does not exist at $1
 "
