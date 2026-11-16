@@ -49,9 +49,13 @@ handle_home_applet() {
     fi
     create_applet "$applet_page"
     create_file "$applet_page" "index.ts" "$index"
+    touch "$webapp_directory/$applet_page/home_applet"
 }
 
 handle_regular_applet() {
+    if [ -f "$webapp_directory/$applet_name/home_applet" ]; then { "error: $tool_name failed to create "$webapp_directory/$1/$2" applet already exists and is a home applet"
+    echo "hello"
+    fi
     if [ "$applet_page" = "home" ]; then
 	create_applet "$applet_name"
 	create_applet "$applet_name/menu_applet"
