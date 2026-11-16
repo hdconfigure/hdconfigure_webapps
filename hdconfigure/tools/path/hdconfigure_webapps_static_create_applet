@@ -68,7 +68,7 @@ import { pathToFileURL } from 'url';
 	    hdui.image("https://en.wikipedia.org/wiki/Apple#/media/File:Pink_lady_and_cross_section.jpg") +
 	    hdui.text(
 		"This is some text") +
-	    hdui.button("https://www.google.com/", "This is a buton")
+	    hdui.button("https://www.google.com/", "This is a button")
 
     );
 
@@ -137,7 +137,7 @@ import { pathToFileURL } from 'url';
 	    hdui.image("https://en.wikipedia.org/wiki/Apple#/media/File:Pink_lady_and_cross_section.jpg") +
 	    hdui.text(
 		"This is some text") +
-	    hdui.button("https://www.google.com/", "This is a buton")
+	    hdui.button("https://www.google.com/", "This is a button")
 
     );
 
