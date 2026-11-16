@@ -19,6 +19,14 @@ check_webapp_dir() {
     fi
 }
 
+get_menu_path() {
+    if [ "$applet_name" = "home" ]; then
+        echo "$webapp_directory/menu_applet/index.ts"
+    else
+        echo "$webapp_directory/$applet_name/menu_applet/index.ts"
+    fi
+}
+
 get_home_path() {
     if [ "$applet_page" = "home" ]; then
         echo "$webapp_directory/home/index.ts"
@@ -35,7 +43,7 @@ get_sub_path() {
     fi
 }
 
-get_target_path() {
+get_non_menu_path() {
     if [ "$applet_name" = "home" ]; then
         get_home_path
     else
@@ -43,13 +51,18 @@ get_target_path() {
     fi
 }
 
-open_file() {
-    if [ -f "$1" ]; then
-        emacs "$1"
+get_target_path() {
+    if [ "$applet_page" = "menu" ]; then
+        get_menu_path
     else
+        get_non_menu_path
+    fi
+}
+
+open_file() {
+    if [ -f "$1" ]; then vi "$1"; else
         error "error: $tool_name index.ts does not exist at $1
-"
-        exit 1
+"; exit 1
     fi
 }
 
