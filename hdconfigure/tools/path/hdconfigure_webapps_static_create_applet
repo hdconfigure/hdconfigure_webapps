@@ -3,6 +3,11 @@
 #Copyright (C) 2026 by Theron Kauk and John Morris Beck <hd.configure.direct@gmail.com> THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 tool_name="hdconfigure_webapps_static_create_applet"
 
+if [ "$#" -lt 4 ]; then
+    error "error: $tool_name usage: $tool_name <github_username> <github_repo_name> <applet_name> <applet_page>\n"
+    exit 1
+fi
+
 github_username="$1"
 github_repo_name="$2"
 applet_name="$3"
@@ -11,89 +16,43 @@ applet_page="$4"
 webapp_parent_directory="$HOME/.config/hdconfigure/webapps/static/$github_username"
 webapp_directory="$webapp_parent_directory/$github_repo_name"
 
+if [ ! -d "$webapp_directory" ]; then
+    error "error: $tool_name webapp directory $webapp_directory does not exist.\n"
+    exit 1
+fi
+
 index_ts=$(cat << 'EOF'
-/*
-  Copyright (C) 2026 by Theron Kauk and John Morris Beck <hdconfigure.direct@gmail.com> 
-  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE 
-  INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE 
-  FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS 
-  OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING 
-  OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-*/
-import path from 'path';
-import os from 'os';
-import { pathToFileURL } from 'url';
-(async () => {
-    const configPath = path.join(
-	os.homedir(),
-	'.config',
-	'hdconfigure',
-	'tools',
-	'git',
-	'hdconfigure',
-	'hdconfigure_webapps',
-	'hdconfigure_webapps_build_page.ts'
-    );
-    const configUrl = pathToFileURL(configPath).href;
-    const hdui = await import(configUrl);
-    const result = hdui.generate_html_page(
-
-
-
-
-
-
-
-
-
-
-
-
-	"/style.css",
-	"TruckAds",
-	"./menu/",
-	"Truck Ads",
-	"by HD Configure",
-
-
-
-
-
-
-	hdui.subheader("This is a subheader") +
-	    hdui.image("https://upload.wikimedia.org/wikipedia/commons/a/a6/Pink_lady_and_cross_section.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original") +
-	    hdui.text(
-		"This is some text") +
-	    hdui.button("https://www.google.com", "This is a button") 
-    );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    console.log(result);
-})().catch(console.error);
+sample_file
 EOF
 )
 
+menu_ts=$(cat << 'EOF'
+sample_menu
+EOF
+)
+
+create_applet() {
+    mkdir "$webapp_directory/$1" || { error "error: $tool_name failed to create applet $1.\n"; exit 1; }
+}
+
 if [ "$applet_name" = "home" ]; then
-    mkdir "$webapp_directory/$applet_page" || { error "error: $tool_name failed to create applet page directory $webapp_directory/$applet_page. Applet page already exists.\n"; exit 1; }
-    print "$index_ts" > "$webapp_directory/$applet_page/index.ts" || { error "error: $tool_name failed to create index.ts file in $webapp_directory/$applet_page.\n"; exit 1; }
-else
+    create_applet "$applet_name"
+    print "$index_ts" > "$webapp_directory/$applet_name/index.ts" || { error "error: $tool_name failed to create index.ts file in $webapp_directory/$applet_name.\n"; exit 1; }
     if [ "$applet_page" = "home" ]; then
-        mkdir "$webapp_directory/$applet_name" || { error "error: $tool_name failed to create applet directory $webapp_directory/$applet_name. Applet already exists.\n"; exit 1; }
-        print "$index_ts" > "$webapp_directory/$applet_name/index.ts" || { error "error: $tool_name failed to create index.ts file in $webapp_directory/$applet_name.\n"; exit 1; }
+        create_applet "$applet_name/menu"
+        print "$menu_ts" > "$webapp_directory/$applet_name/menu/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/$applet_name/menu.\n"; exit 1; }
     else
-        mkdir "$webapp_directory/$applet_name/$applet_page" || { error "error: $tool_name failed to create applet directory $webapp_directory/$applet_name/$applet_page. Applet already exists.\n"; exit 1; }
-        print "$index_ts" > "$webapp_directory/$applet_name/$applet_page/index.ts" || { error "error: $tool_name failed to create index.ts file in $webapp_directory/$applet_name/$applet_page.\n"; exit 1; }
+        create_applet "$applet_name/$applet_page"
+        print "$menu_ts" > "$webapp_directory/$applet_name/$applet_page/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/$applet_name/$applet_page.\n"; exit 1; }
+    fi
+else
+    create_applet "$applet_name"
+    if [ "$applet_page" = "home" ]; then
+        print "$index_ts" > "$webapp_directory/$applet_name/index.ts" || { error "error: $tool_name failed to create index.ts file in $webapp_directory/$applet_name.\n"; exit 1; }
+        create_applet "$applet_name/menu"
+        print "$menu_ts" > "$webapp_directory/$applet_name/menu/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/$applet_name/menu.\n"; exit 1; }
+    else
+        create_applet "$applet_name/$applet_page"
+        print "$menu_ts" > "$webapp_directory/$applet_name/$applet_page/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/$applet_name/$applet_page.\n"; exit 1; }
     fi
 fi
