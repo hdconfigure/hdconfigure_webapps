@@ -4,7 +4,8 @@
 tool_name="hdconfigure_webapps_static_create_applet"
 
 if [ "$#" -lt 4 ]; then
-    error "error: $tool_name usage: $tool_name <github_username> <github_repo_name> <applet_name> <applet_page>\n"
+    error "error: $tool_name usage: $tool_name <github_username> <github_repo_name> <applet_name> <applet_page>
+"
     exit 1
 fi
 
@@ -17,7 +18,8 @@ webapp_parent_directory="$HOME/.config/hdconfigure/webapps/static/$github_userna
 webapp_directory="$webapp_parent_directory/$github_repo_name"
 
 if [ ! -d "$webapp_directory" ]; then
-    error "error: $tool_name webapp directory $webapp_directory does not exist.\n"
+    error "error: $tool_name webapp directory $webapp_directory does not exist.
+"
     exit 1
 fi
 
@@ -32,27 +34,33 @@ EOF
 )
 
 create_applet() {
-    mkdir "$webapp_directory/$1" || { error "error: $tool_name failed to create applet $1.\n"; exit 1; }
+    mkdir "$webapp_directory/$1" || { error "error: $tool_name failed to create applet $1.
+"; exit 1; }
 }
 
 if [ "$applet_name" = "home" ]; then
-    create_applet "$applet_name"
-    print "$index_ts" > "$webapp_directory/$applet_name/index.ts" || { error "error: $tool_name failed to create index.ts file in $webapp_directory/$applet_name.\n"; exit 1; }
+    print "$index_ts" > "$webapp_directory/$applet_name/index.ts" || { error "error: $tool_name failed to create index.ts file in $webapp_directory/$applet_name.
+"; exit 1; }
     if [ "$applet_page" = "home" ]; then
         create_applet "menu_applet"
-        print "$menu_ts" > "$webapp_directory/menu_applet/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/menu_applet.\n"; exit 1; }
+        print "$menu_ts" > "$webapp_directory/menu_applet/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/menu_applet.
+"; exit 1; }
     else
         create_applet "$applet_name/$applet_page"
-        print "$menu_ts" > "$webapp_directory/$applet_name/$applet_page/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/$applet_name/$applet_page.\n"; exit 1; }
+        print "$menu_ts" > "$webapp_directory/$applet_name/$applet_page/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/$applet_name/$applet_page.
+"; exit 1; }
     fi
 else
     create_applet "$applet_name"
     if [ "$applet_page" = "home" ]; then
-        print "$index_ts" > "$webapp_directory/$applet_name/index.ts" || { error "error: $tool_name failed to create index.ts file in $webapp_directory/$applet_name.\n"; exit 1; }
+        print "$index_ts" > "$webapp_directory/$applet_name/index.ts" || { error "error: $tool_name failed to create index.ts file in $webapp_directory/$applet_name.
+"; exit 1; }
         create_applet "$applet_name/menu_applet"
-        print "$menu_ts" > "$webapp_directory/$applet_name/menu_applet/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/$applet_name/menu_applet.\n"; exit 1; }
+        print "$menu_ts" > "$webapp_directory/$applet_name/menu_applet/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/$applet_name/menu_applet.
+"; exit 1; }
     else
         create_applet "$applet_name/$applet_page"
-        print "$menu_ts" > "$webapp_directory/$applet_name/$applet_page/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/$applet_name/$applet_page.\n"; exit 1; }
+        print "$menu_ts" > "$webapp_directory/$applet_name/$applet_page/menu.ts" || { error "error: $tool_name failed to create menu.ts file in $webapp_directory/$applet_name/$applet_page.
+"; exit 1; }
     fi
 fi
