@@ -56,7 +56,7 @@ handle_home_applet() {
 }
 
 handle_regular_applet() {
-    if [ -f "$webapp_directory/$applet_name/home_applet" ]; then { "error: $tool_name failed to create "$webapp_directory/$1/$2" applet already exists and is a home applet"
+    if [ -f "$webapp_directory/$applet_name/home_applet" ]; then { "error: $tool_name failed to create "$webapp_directory/$1/$2" applet already exists and is a home applet"; fi;
     echo "hello"
     fi
     if [ "$applet_page" = "home" ]; then
