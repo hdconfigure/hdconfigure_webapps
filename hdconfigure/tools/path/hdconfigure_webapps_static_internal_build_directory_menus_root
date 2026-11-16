@@ -31,13 +31,19 @@ is_home_applet_directory() {
     [ -d "$1" ] && [ -f "$1/index.ts" ] && [ -f "$1/home_applet" ]
 }
 
+ensure_directory_exists() {
+    mkdir -p "$1" || fail "failed to create directory $1."
+}
+
 copy_menu_to_directory() {
-    cp "$menu_source" "$1/index.ts" || fail "failed to copy $menu_source to $1/index.ts."
+    ensure_directory_exists "$1/menu"
+    cp "$menu_source" "$1/menu/index.ts" || fail "failed to copy $menu_source to $1/menu/index.ts."
 }
 
 sync_directory_if_home_applet() {
-    if is_home_applet_directory "$1"; then
-        copy_menu_to_directory "$1"
+    foo="$1"
+    if is_home_applet_directory "$foo"; then
+        copy_menu_to_directory "$foo"
     fi
 }
 
