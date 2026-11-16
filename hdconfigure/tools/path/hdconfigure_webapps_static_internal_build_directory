@@ -3,78 +3,92 @@
 #Copyright (C) 2026 by Theron Kauk and John Morris Beck <hd.configure.direct@gmail.com> THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 tool_name="hdconfigure_webapps_static_internal_build_directory"
 
-if [ "$#" -lt 2 ]; then
-    error "error: $tool_name usage: $tool_name <github_username> <github_repo_name>
+check_args() {
+    if [ "$#" -lt 2 ]; then
+        error "error: $tool_name usage: $tool_name <github_username> <github_repo_name>
 "
-    exit 1
-fi
+        exit 1
+    fi
+}
 
+check_webapp_dir() {
+    if [ ! -d "$webapp_directory" ]; then
+        error "error: $tool_name webapp directory $webapp_directory does not exist.
+"
+        exit 1
+    fi
+}
+
+handle_root_home() {
+    [ -d "$webapp_directory/home" ] && [ -f "$webapp_directory/home/index.ts" ] || return
+    mkdir -p "$webapp_directory/home/menu" || { error "error: $tool_name failed to create menu.
+"; exit 1; }
+    cp "$webapp_directory/menu_applet/index.ts" "$webapp_directory/home/menu/index.ts" || { error "error: $tool_name failed to copy.
+"; exit 1; }
+}
+
+process_root_applet_item() {
+    [ "$(basename "$1")" = "menu_applet" ] || [ "$(basename "$1")" = "home" ] && return
+    [ -f "$1/home_applet" ] && [ -f "$1/index.ts" ] || return
+    mkdir -p "$1/menu" || { error "error: $tool_name failed to create menu.
+"; exit 1; }
+    cp "$webapp_directory/menu_applet/index.ts" "$1/menu/index.ts" || { error "error: $tool_name failed to copy.
+"; exit 1; }
+}
+
+handle_root_other_applets() {
+    for applet_path in "$webapp_directory"/*; do
+        [ -d "$applet_path" ] && process_root_applet_item "$applet_path"
+    done
+}
+
+handle_root_level_applets() {
+    [ -d "$webapp_directory/menu_applet" ] && [ -f "$webapp_directory/menu_applet/index.ts" ] || return
+    handle_root_home
+    handle_root_other_applets
+}
+
+process_subapplet_self() {
+    [ -f "$1/index.ts" ] || return
+    mkdir -p "$1/menu" || { error "error: $tool_name failed to create menu.
+"; exit 1; }
+    cp "$2" "$1/menu/index.ts" || { error "error: $tool_name failed to copy.
+"; exit 1; }
+}
+
+process_subfolder_item() {
+    [ "$(basename "$1")" = "menu_applet" ] || [ "$(basename "$1")" = "menu" ] && return
+    [ -f "$1/index.ts" ] || return
+    mkdir -p "$1/menu" || { error "error: $tool_name failed to create menu.
+"; exit 1; }
+    cp "$2" "$1/menu/index.ts" || { error "error: $tool_name failed to copy.
+"; exit 1; }
+}
+
+process_all_subfolders() {
+    for sub_path in "$1"/*; do
+        [ -d "$sub_path" ] && process_subfolder_item "$sub_path" "$2"
+    done
+}
+
+process_regular_applet_item() {
+    [ "$(basename "$1")" = "menu_applet" ] || [ "$(basename "$1")" = "home" ] && return
+    [ -f "$1/home_applet" ] || [ ! -f "$1/menu_applet/index.ts" ] && return
+    process_subapplet_self "$1" "$1/menu_applet/index.ts"
+    process_all_subfolders "$1" "$1/menu_applet/index.ts"
+}
+
+handle_regular_subapplets() {
+    for applet_path in "$webapp_directory"/*; do
+        [ -d "$applet_path" ] && process_regular_applet_item "$applet_path"
+    done
+}
+
+check_args "$@"
 github_username="$1"
 github_repo_name="$2"
-
 webapp_directory="$HOME/.config/hdconfigure/webapps/static/$github_username/$github_repo_name"
+check_webapp_dir
 
-if [ ! -d "$webapp_directory" ]; then
-    error "error: $tool_name webapp directory $webapp_directory does not exist.
-"
-    exit 1
-fi
-
-# 1. Handle root-level applets (home and any applet containing home_applet) using root menu_applet
-if [ -d "$webapp_directory/menu_applet" ] && [ -f "$webapp_directory/menu_applet/index.ts" ]; then
-    if [ -d "$webapp_directory/home" ] && [ -f "$webapp_directory/home/index.ts" ]; then
-        mkdir -p "$webapp_directory/home/menu" || { error "error: $tool_name failed to create menu directory in $webapp_directory/home.
-"; exit 1; }
-        cp "$webapp_directory/menu_applet/index.ts" "$webapp_directory/home/menu/index.ts" || { error "error: $tool_name failed to copy index.ts to $webapp_directory/home/menu.
-"; exit 1; }
-    fi
-
-    for applet_path in "$webapp_directory"/*; do
-        if [ -d "$applet_path" ]; then
-            applet_name_base=$(basename "$applet_path")
-            if [ "$applet_name_base" != "menu_applet" ] && [ "$applet_name_base" != "home" ]; then
-                if [ -f "$applet_path/home_applet" ] && [ -f "$applet_path/index.ts" ]; then
-                    mkdir -p "$applet_path/menu" || { error "error: $tool_name failed to create menu directory in $applet_path.
-"; exit 1; }
-                    cp "$webapp_directory/menu_applet/index.ts" "$applet_path/menu/index.ts" || { error "error: $tool_name failed to copy index.ts to $applet_path/menu.
-"; exit 1; }
-                fi
-            fi
-        fi
-    done
-fi
-
-# 2 & 3. Handle regular subapplets (non-home applets with their own menu_applet) and their subfolders
-for applet_path in "$webapp_directory"/*; do
-    if [ -d "$applet_path" ]; then
-        applet_name_base=$(basename "$applet_path")
-        if [ "$applet_name_base" != "menu_applet" ] && [ "$applet_name_base" != "home" ]; then
-            if [ ! -f "$applet_path/home_applet" ]; then
-                if [ -d "$applet_path/menu_applet" ] && [ -f "$applet_path/menu_applet/index.ts" ]; then
-                    # Second kind: subapplet itself gets its own menu directory
-                    if [ -f "$applet_path/index.ts" ]; then
-                        mkdir -p "$applet_path/menu" || { error "error: $tool_name failed to create menu directory in $applet_path.
-"; exit 1; }
-                        cp "$applet_path/menu_applet/index.ts" "$applet_path/menu/index.ts" || { error "error: $tool_name failed to copy index.ts to $applet_path/menu.
-"; exit 1; }
-                    fi
-
-                    # Third kind: every subfolder in the subapplet that contains an index.ts
-                    for sub_path in "$applet_path"/*; do
-                        if [ -d "$sub_path" ]; then
-                            sub_name_base=$(basename "$sub_path")
-                            if [ "$sub_name_base" != "menu_applet" ] && [ "$sub_name_base" != "menu" ]; then
-                                if [ -f "$sub_path/index.ts" ]; then
-                                    mkdir -p "$sub_path/menu" || { error "error: $tool_name failed to create menu directory in $sub_path.
-"; exit 1; }
-                                    cp "$applet_path/menu_applet/index.ts" "$sub_path/menu/index.ts" || { error "error: $tool_name failed to copy index.ts to $sub_path/menu.
-"; exit 1; }
-                                fi
-                            fi
-                        fi
-                    done
-                fi
-            fi
-        fi
-    fi
-done
+handle_root_level_applets
+handle_regular_subapplets
