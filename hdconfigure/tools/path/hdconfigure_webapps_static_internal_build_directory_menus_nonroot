@@ -30,22 +30,29 @@ is_updatable_subpage_directory() {
     [ -d "$1" ] && [ -f "$1/index.ts" ] && [ "$dir_name" != "menu" ] && [ "$dir_name" != "menu_applet" ]
 }
 
-validate_subapplet_menu_paths() {
+validate_menu_source() {
     if [ ! -f "$1/menu_applet/index.ts" ]; then
         fail "menu_applet exists in $1, but $1/menu_applet/index.ts does not exist."
     fi
-    if [ ! -d "$1/menu" ]; then
-        fail "destination directory $1/menu does not exist."
-    fi
+}
+
+ensure_directory_exists() {
+    mkdir -p "$1" || fail "failed to create directory $1."
 }
 
 copy_menu_file() {
     cp "$1" "$2" || fail "failed to copy $1 to $2."
 }
 
+install_menu_into_directory() {
+    ensure_directory_exists "$2"
+    copy_menu_file "$1" "$2/index.ts"
+}
+
 sync_subpage_if_eligible() {
-    if is_updatable_subpage_directory "$2"; then
-        copy_menu_file "$1" "$2/index.ts"
+    current_subapplet_page="$2"
+    if is_updatable_subpage_directory "$current_subapplet_page"; then
+        install_menu_into_directory "$1" "$current_subapplet_page/menu"
     fi
 }
 
@@ -58,8 +65,8 @@ distribute_menu_to_subpages() {
 process_nonroot_applet() {
     subapplet_directory="$1"
     if [ -d "$subapplet_directory/menu_applet" ]; then
-        validate_subapplet_menu_paths "$subapplet_directory"
-        copy_menu_file "$subapplet_directory/menu_applet/index.ts" "$subapplet_directory/menu/index.ts"
+        validate_menu_source "$subapplet_directory"
+        install_menu_into_directory "$subapplet_directory/menu_applet/index.ts" "$subapplet_directory/menu"
         distribute_menu_to_subpages "$subapplet_directory" "$subapplet_directory/menu_applet/index.ts"
     fi
 }
