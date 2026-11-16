@@ -49,7 +49,10 @@ handle_home_applet() {
     fi
     create_applet "$applet_page"
     create_file "$applet_page" "index.ts" "$index"
-    touch "$webapp_directory/$applet_page/home_applet"
+    if [ "$applet_page" != "home" ];
+       touch "$webapp_directory/$applet_page/home_applet"
+       echo "you reached me"
+    fi;
 }
 
 handle_regular_applet() {
