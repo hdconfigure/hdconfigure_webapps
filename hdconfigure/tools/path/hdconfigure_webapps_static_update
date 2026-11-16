@@ -9,7 +9,7 @@ github_repo_name="$2"
 webapp_parent_directory="$HOME/.config/hdconfigure/webapps/static/$github_username"
 webapp_directory="$webapp_parent_directory/$github_repo_name"
 
-hdconfigure_webapps_static_internal_build_directory_menus_nonroot "$github_username" "$github_repo_name" || { error "error: $tool_name failed to build webapp directory
+#hdconfigure_webapps_static_internal_build_directory_menus_nonroot "$github_username" "$github_repo_name" || { error "error: $tool_name failed to build webapp directory
 " ; exit 1 ; } ;
 hdconfigure_webapps_static_internal_build_directory_menus_root "$github_username" "$github_repo_name" || { error "error: $tool_name failed to build webapp directory
 " ; exit 1 ; } ;
