@@ -1,0 +1,64 @@
+#!/usr/bin/env sh
+#~/.config/hdconfigure/tools/git/hdconfigure/hdconfigure_webapps/hdconfigure/tools/path/hdconfigure_webapps_static_edit
+#Copyright (C) 2026 by Theron Kauk and John Morris Beck <hd.configure.direct@gmail.com> THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+tool_name="hdconfigure_webapps_static_edit"
+
+check_args() {
+    if [ "$#" -lt 4 ]; then
+        error "error: $tool_name usage: $tool_name <github_username> <github_repo_name> <applet_name> <applet_page>
+"
+        exit 1
+    fi
+}
+
+check_webapp_dir() {
+    if [ ! -d "$webapp_directory" ]; then
+        error "error: $tool_name webapp directory $webapp_directory does not exist.
+"
+        exit 1
+    fi
+}
+
+get_home_path() {
+    if [ "$applet_page" = "home" ]; then
+        echo "$webapp_directory/home/index.ts"
+    else
+        echo "$webapp_directory/$applet_page/index.ts"
+    fi
+}
+
+get_sub_path() {
+    if [ "$applet_page" = "home" ]; then
+        echo "$webapp_directory/$applet_name/index.ts"
+    else
+        echo "$webapp_directory/$applet_name/$applet_page/index.ts"
+    fi
+}
+
+get_target_path() {
+    if [ "$applet_name" = "home" ]; then
+        get_home_path
+    else
+        get_sub_path
+    fi
+}
+
+open_file() {
+    if [ -f "$1" ]; then
+        vi "$1"
+    else
+        error "error: $tool_name index.ts does not exist at $1
+"
+        exit 1
+    fi
+}
+
+check_args "$@"
+github_username="$1"
+github_repo_name="$2"
+applet_name="$3"
+applet_page="$4"
+webapp_directory="$HOME/.config/hdconfigure/webapps/static/$github_username/$github_repo_name"
+check_webapp_dir
+target_file=$(get_target_path)
+open_file "$target_file"
