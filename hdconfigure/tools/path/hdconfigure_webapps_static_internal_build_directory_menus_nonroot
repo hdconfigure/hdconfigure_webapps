@@ -1,0 +1,85 @@
+#!/usr/bin/env sh
+#~/.config/hdconfigure/tools/git/hdconfigure/hdconfigure_webapps/hdconfigure/tools/path/hdconfigure_webapps_static_internal_build_directory_menus_nonroot
+#Copyright (C) 2026 by Theron Kauk and John Morris Beck <hd.configure.direct@gmail.com> THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+tool_name="hdconfigure_webapps_static_internal_build_directory_menus_nonroot"
+
+fail() {
+    error "error: $tool_name $1
+"
+    exit 1
+}
+
+validate_argument_count() {
+    if [ "$1" -lt 2 ]; then
+        fail "usage: $tool_name <github_username> <github_repo_name>"
+    fi
+}
+
+validate_webapp_directory() {
+    if [ ! -d "$webapp_directory" ]; then
+        fail "webapp directory $webapp_directory does not exist."
+    fi
+}
+
+is_nonroot_applet_directory() {
+    [ -d "$1" ] && [ -f "$1/index.ts" ] && [ ! -f "$1/home_applet" ]
+}
+
+is_updatable_subpage_directory() {
+    dir_name="$(basename "$1")"
+    [ -d "$1" ] && [ -f "$1/index.ts" ] && [ "$dir_name" != "menu" ] && [ "$dir_name" != "menu_applet" ]
+}
+
+validate_subapplet_menu_paths() {
+    if [ ! -f "$1/menu_applet/index.ts" ]; then
+        fail "menu_applet exists in $1, but $1/menu_applet/index.ts does not exist."
+    fi
+    if [ ! -d "$1/menu" ]; then
+        fail "destination directory $1/menu does not exist."
+    fi
+}
+
+copy_menu_file() {
+    cp "$1" "$2" || fail "failed to copy $1 to $2."
+}
+
+sync_subpage_if_eligible() {
+    if is_updatable_subpage_directory "$2"; then
+        copy_menu_file "$1" "$2/index.ts"
+    fi
+}
+
+distribute_menu_to_subpages() {
+    for candidate_dir in "$1"/*; do
+        sync_subpage_if_eligible "$2" "$candidate_dir"
+    done
+}
+
+process_nonroot_applet() {
+    subapplet_directory="$1"
+    if [ -d "$subapplet_directory/menu_applet" ]; then
+        validate_subapplet_menu_paths "$subapplet_directory"
+        copy_menu_file "$subapplet_directory/menu_applet/index.ts" "$subapplet_directory/menu/index.ts"
+        distribute_menu_to_subpages "$subapplet_directory" "$subapplet_directory/menu_applet/index.ts"
+    fi
+}
+
+sync_directory_if_nonroot_applet() {
+    if is_nonroot_applet_directory "$1"; then
+        process_nonroot_applet "$1"
+    fi
+}
+
+build_directory_menus_nonroot() {
+    for target_dir in "$webapp_directory"/*; do
+        sync_directory_if_nonroot_applet "$target_dir"
+    done
+}
+
+validate_argument_count "$#"
+github_username="$1"
+github_repo_name="$2"
+webapp_directory="$HOME/.config/hdconfigure/webapps/static/$github_username/$github_repo_name"
+
+validate_webapp_directory
+build_directory_menus_nonroot
