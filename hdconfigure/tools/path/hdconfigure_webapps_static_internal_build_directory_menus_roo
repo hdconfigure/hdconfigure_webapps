@@ -1,0 +1,64 @@
+#!/usr/bin/env sh
+#~/.config/hdconfigure/tools/git/hdconfigure/hdconfigure_webapps/hdconfigure/tools/path/hdconfigure_webapps_static_internal_build_directory_menus_root
+#Copyright (C) 2026 by Theron Kauk and John Morris Beck <hd.configure.direct@gmail.com> THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+tool_name="hdconfigure_webapps_static_internal_build_directory_menus_root"
+
+fail() {
+    error "error: $tool_name $1
+"
+    exit 1
+}
+
+validate_argument_count() {
+    if [ "$1" -lt 2 ]; then
+        fail "usage: $tool_name <github_username> <github_repo_name>"
+    fi
+}
+
+validate_webapp_directory() {
+    if [ ! -d "$webapp_directory" ]; then
+        fail "webapp directory $webapp_directory does not exist."
+    fi
+}
+
+validate_menu_source() {
+    if [ ! -f "$menu_source" ]; then
+        fail "menu_applet exists, but $menu_source does not exist."
+    fi
+}
+
+is_home_applet_directory() {
+    [ -d "$1" ] && [ -f "$1/index.ts" ] && [ -f "$1/home_applet" ]
+}
+
+copy_menu_to_directory() {
+    cp "$menu_source" "$1/index.ts" || fail "failed to copy $menu_source to $1/index.ts."
+}
+
+sync_directory_if_home_applet() {
+    if is_home_applet_directory "$1"; then
+        copy_menu_to_directory "$1"
+    fi
+}
+
+distribute_menu_to_home_applets() {
+    for target_dir in "$webapp_directory"/*; do
+        sync_directory_if_home_applet "$target_dir"
+    done
+}
+
+build_directory_menus_root() {
+    if [ -d "$webapp_directory/menu_applet" ]; then
+        validate_menu_source
+        distribute_menu_to_home_applets
+    fi
+}
+
+validate_argument_count "$#"
+github_username="$1"
+github_repo_name="$2"
+webapp_directory="$HOME/.config/hdconfigure/webapps/static/$github_username/$github_repo_name"
+menu_source="$webapp_directory/menu_applet/index.ts"
+
+validate_webapp_directory
+build_directory_menus_root
