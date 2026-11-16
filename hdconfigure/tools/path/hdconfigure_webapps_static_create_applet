@@ -187,7 +187,7 @@ create_file(){
 handle_home_applet() {
     if [ "$applet_page" = "home" ]; then
 	create_applet "menu_applet"
-        create_file "menu_applet" "menu.ts" "$menu"
+        create_file "menu_applet" "index.ts" "$menu"
     fi
     create_applet "$applet_page"
     create_file "$applet_page" "index.ts" "$index"
@@ -204,7 +204,7 @@ handle_regular_applet() {
     if [ "$applet_page" = "home" ]; then
 	create_applet "$applet_name"
 	create_applet "$applet_name/menu_applet"
-        create_file "$applet_name/menu_applet" "menu.ts" "$menu"
+        create_file "$applet_name/menu_applet" "index.ts" "$menu"
 	create_file "$applet_name" "index.ts" "$index"
     else
         create_applet "$applet_name/$applet_page"
