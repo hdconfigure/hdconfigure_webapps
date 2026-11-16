@@ -41,7 +41,7 @@ collect_directories_recursively() {
 }
 
 build_page_for_directory() {
-    hdconfigure_webapps_static_internalbuild_page "$1" || fail "failed to build page for $1."
+    hdconfigure_webapps_static_internal_build_page "$1" || fail "failed to build page for $1."
 }
 
 process_recorded_directories() {
