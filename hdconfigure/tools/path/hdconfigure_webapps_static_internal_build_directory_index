@@ -1,0 +1,61 @@
+#!/usr/bin/env sh
+#~/.config/hdconfigure/tools/git/hdconfigure/hdconfigure_webapps/hdconfigure/tools/path/hdconfigure_webapps_static_internal_build_directory_index
+#Copyright (C) 2026 by Theron Kauk and John Morris Beck <hd.configure.direct@gmail.com> THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+tool_name="hdconfigure_webapps_static_internal_build_directory_index"
+
+fail() {
+    error "error: $tool_name $1
+"
+    exit 1
+}
+
+validate_argument_count() {
+    if [ "$1" -lt 2 ]; then
+        fail "usage: $tool_name <github_username> <github_repo_name>"
+    fi
+}
+
+validate_webapp_directory() {
+    if [ ! -d "$webapp_directory" ]; then
+        fail "webapp directory $webapp_directory does not exist."
+    fi
+}
+
+create_directory_list_file() {
+    directory_list_file=$(mktemp) || fail "failed to create temporary file."
+    trap 'rm -f "$directory_list_file"' EXIT INT TERM
+}
+
+record_directory_if_index_exists() {
+    if [ -f "$1/index.ts" ]; then
+        print "$1
+" >> "$directory_list_file" || fail "failed to write to $directory_list_file."
+    fi
+}
+
+collect_directories_recursively() {
+    record_directory_if_index_exists "$1"
+    for entry in "$1"/*; do
+        [ -d "$entry" ] && collect_directories_recursively "$entry"
+    done
+}
+
+build_page_for_directory() {
+    hdconfigure_webapps_static_internalbuild_page "$1" || fail "failed to build page for $1."
+}
+
+process_recorded_directories() {
+    while IFS= read -r target_dir; do
+        [ -n "$target_dir" ] && build_page_for_directory "$target_dir"
+    done < "$directory_list_file"
+}
+
+validate_argument_count "$#"
+github_username="$1"
+github_repo_name="$2"
+webapp_directory="$HOME/.config/hdconfigure/webapps/static/$github_username/$github_repo_name"
+
+validate_webapp_directory
+create_directory_list_file
+collect_directories_recursively "$webapp_directory"
+process_recorded_directories
