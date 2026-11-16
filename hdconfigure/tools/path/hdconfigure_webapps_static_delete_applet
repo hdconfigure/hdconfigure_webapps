@@ -1,0 +1,90 @@
+#!/usr/bin/env sh
+#~/.config/hdconfigure/tools/git/hdconfigure/hdconfigure_webapps/hdconfigure/tools/path/hdconfigure_webapps_static_delete_applet
+#Copyright (C) 2026 by Theron Kauk and John Morris Beck <hd.configure.direct@gmail.com> THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+tool_name="hdconfigure_webapps_static_delete_applet"
+
+if [ "$#" -lt 4 ]; then
+    error "error: $tool_name usage: $tool_name <github_username> <github_repo_name> <applet_name> <applet_page>
+"
+    exit 1
+fi
+
+github_username="$1"
+github_repo_name="$2"
+applet_name="$3"
+applet_page="$4"
+
+webapp_directory="$HOME/.config/hdconfigure/webapps/static/$github_username/$github_repo_name"
+
+if [ ! -d "$webapp_directory" ]; then
+    error "error: $tool_name webapp directory $webapp_directory does not exist.
+"
+    exit 1
+fi
+
+delete_directory() {
+    target_dir="$1"
+    if [ -d "$target_dir" ]; then
+        rm -rf "$target_dir" || { error "error: $tool_name failed to delete directory $target_dir.
+"; exit 1; }
+    else
+        error "error: $tool_name directory $target_dir does not exist.
+"
+        exit 1
+    fi
+}
+
+handle_delete_home_applet() {
+    if [ "$applet_page" = "home" ]; then
+        if [ -d "$webapp_directory/home" ]; then
+            rm -rf "$webapp_directory/home" || { error "error: $tool_name failed to delete $webapp_directory/home.
+"; exit 1; }
+        fi
+        if [ -d "$webapp_directory/menu_applet" ]; then
+            rm -rf "$webapp_directory/menu_applet" || { error "error: $tool_name failed to delete $webapp_directory/menu_applet.
+"; exit 1; }
+        fi
+    else
+        target_path="$webapp_directory/$applet_page"
+        if [ -f "$target_path/home_applet" ]; then
+            delete_directory "$target_path"
+        else
+            error "error: $tool_name $target_path is not a valid webapp directory applet (missing home_applet).
+"
+            exit 1
+        fi
+    fi
+}
+
+handle_delete_regular_applet() {
+    if [ "$applet_page" = "home" ]; then
+        target_path="$webapp_directory/$applet_name"
+        if [ -d "$target_path" ]; then
+            if [ -f "$target_path/home_applet" ]; then
+                error "error: $tool_name $target_path is a home applet directory and cannot be deleted as a regular subapplet.
+"
+                exit 1
+            fi
+            delete_directory "$target_path"
+        else
+            error "error: $tool_name applet directory $target_path does not exist.
+"
+            exit 1
+        fi
+    else
+        target_path="$webapp_directory/$applet_name/$applet_page"
+        if [ -d "$target_path" ]; then
+            delete_directory "$target_path"
+        else
+            error "error: $tool_name subapplet directory $target_path does not exist.
+"
+            exit 1
+        fi
+    fi
+}
+
+if [ "$applet_name" = "home" ]; then
+    handle_delete_home_applet
+else
+    handle_delete_regular_applet
+fi
