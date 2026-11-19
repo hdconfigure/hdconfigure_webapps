@@ -25,6 +25,9 @@ ${body}
 // make a navbar for the page
 export const top_bar = (menu_link: string, button_link: string, header_text: string, subheader_text: string): string => {
     return `
+
+
+    <!-- top bar -->
   <div class="top-bar">
     <a href="${menu_link}" class="menu-link" title="Open Menu">
       <img src="${button_link}" alt="Menu">
@@ -32,47 +35,79 @@ export const top_bar = (menu_link: string, button_link: string, header_text: str
     </a>
     <span class="top-bar-title">${header_text}</span>
     <span class="top-bar-subtitle">${subheader_text}</span>
-  </div>`;
+  </div>
+  
+  
+  `;
 };
 
 export const text = (text_value: string): string => {
     return `
+
+
+    <!-- text -->
     <div class="info-block">
       <p>
         ${text_value}
       </p>
-    </div>`;
+    </div>
+    
+    
+    `;
 };
 
 // add a license to the bottom of the page
 export const bottom_license = (license: string): string => {
     return `
+
+
+    <!-- bottom license -->
 <div style="text-align: right; font-size: 11px; color: #888888; font-family: sans-serif;">
   ${license}
-</div>`;
+</div>
+
+
+`;
 };
 
 // make a subheader element for sections, images, or text with layered boxes
 export const subheader = (header_text: string): string => {
     return `
+
+    <!-- subheader -->
     <div class="subheader-wrapper">
         <h2 class="subheader-title">${header_text}</h2>
-    </div>`;
+    </div>
+    
+    
+    `;
 };
 
 // make an image on the page
 export const image = (image_path: string): string => {
     return `
+
+
+    <!-- image -->
     <div class="table-wrapper">
       <div class="image-cell-flush">
-        <img src="${image_path}" alt="Flight Simulator">
+        <img src="${image_path}">
       </div>
-    </div>`;
+    </div>
+    
+    
+    `;
 };
 
 // make a button on the page (takes text and url)
 export const button = (link: string, text: string): string => {
-    return `<a href="${link}" class="table-btn table-btn-slate">${text}</a>`;
+    return `
+    
+    <!-- Button -->
+    <a href="${link}" class="table-btn table-btn-slate">${text}</a>
+    
+    
+    `;
 };
 
 const license_text = "Copyright (C) 2026 by Theron Kauk and John Morris Beck &lt;HD.Configure.Direct@gmail.com&gt; THE SOFTWARE IS PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.";
